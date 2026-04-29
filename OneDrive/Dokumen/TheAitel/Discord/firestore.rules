@@ -27,7 +27,8 @@ service cloud.firestore {
     // Rooms
     match /rooms/{roomId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Allow writing rooms for authenticated users (required for general room auto-creation)
+      allow write: if isAuthenticated();
     }
   }
 }

@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      // Allow reading any user profile for authentication checks
+      allow read: if isAuthenticated();
+      // Allow creating and updating own profile
+      allow create, update: if isAuthenticated();
+      // Only admins can delete
+      allow delete: if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Messages
+    match /messages/{messageId} {
+      allow read, create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Rooms
+    match /rooms/{roomId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

@@ -39,7 +39,8 @@ const Sidebar = ({ activeRoomId, onRoomSelect }) => {
             'business-development-executive': 'business-development-executive'
           };
           const allowedRoomId = roleToRoom[user?.role];
-          filtered = roomsData.filter(r => r.id === allowedRoomId);
+          // Always allow access to the 'general' room
+          filtered = roomsData.filter(r => r.id === allowedRoomId || r.id === 'general');
         }
 
         setRooms(filtered);
